@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style>th, td {
+        border-bottom: 1px solid #ddd;
+    }</style>
+</head>
+<body>
+    <form action="basic" onsubmit="return main(this)">
+        <p>
+            <input type="text" name="isbn">
+            <button type="submit">Submit</button>
+        </p>
+    </form>
+    <div id="book-info">
+    </div>
+
+
+<script>
+
+    var url;
+    var obj;
+    var bookContainer = document.getElementById('book-info');
+
+    function main(form){
+        url = "https://www.booknomads.com/api/v0/isbn/";
+        url += form.isbn.value;
+        $.getJSON(url, function(data) {
+            renderHTML(data);
+        });
+        return false;
+    }
+
+
+    var col = [];
+    function renderHTML(jsonObject) {
+        for (var key in jsonObject) {
+            if (col.indexOf(key) === -1) {
+                col.push(key);
+            }
+        }
+        var table = document.createElement("table");
+        var tr = table.insertRow(-1);
+
+        for (var i = 0; i < col.length; i++) {
+            var th = document.createElement("th");
+            th.innerHTML = col[i];
+            tr.appendChild(th);
+            var tabCell = tr.insertCell(-1);
+            if (col[i] === "CoverThumb") {
+                tabCell.innerHTML = "<img src=" + jsonObject[col[i]] + " alt=\"Cover\">";
+            } else if(col[i] === "Authors") {
+                var auth = "";
+                for (var j = 0; j < jsonObject[col[i]].length; j++) {
+                    alert(jsonObject[col[i]][j].Name);
+                    auth += jsonObject[col[i]][j].Name;
+                    auth +=" "
+                }
+                tabCell.innerHTML = auth;
+            } else {
+                tabCell.innerHTML = jsonObject[col[i]];
+            }
+
+            var tr = table.insertRow(-1);
+        }
+
+        bookContainer.innerHTML = "";
+        bookContainer.appendChild(table);
+    }
+</script>
+
+</body>
+</html>
+
